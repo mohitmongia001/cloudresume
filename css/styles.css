@@ -3545,6 +3545,10 @@ textarea.form-control-lg {
   display: none;
 }
 
+span.collapse:not(.show) {
+  display: inline;
+}
+
 .collapsing {
   height: 0;
   overflow: hidden;
