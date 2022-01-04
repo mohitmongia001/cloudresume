@@ -3,7 +3,7 @@ name: MMongia Cloud Resume
 on:
   push:
     branches:
-    - cloudresume
+    - cloudresume-aws-stack
 
 jobs:
   deploy:
@@ -12,6 +12,12 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v1
 
+    - name: Setup python
+      uses: actions/setup-python@v2
+    
+    - name: Setup AWS SAM
+      uses: aws-actions/setup-sam@v1
+
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
@@ -19,5 +25,8 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
 
-    - name: Deploy static site to S3 bucket
-      run: aws s3 sync . s3://${{ secrets.AWS_S3_Bucket }} --exclude '.github/*' --exclude '.git/*' --exclude '.gitignore' --exclude '*.md'
+    - name: Run AWS SAM Build
+      run: sam build --use-container
+
+    - name: Run AWS SAM deploy
+      run : sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name mmongia-cloud-resume --s3-bucket ${{ AWS_SAM_S3_BUCKET }} --capabilities CAPABILITY_IAM --region ${{ secrets.AWS_REGION }} 
